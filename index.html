@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Love Fest Athlete Profiles</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <aside class="sidebar" aria-label="Athlete browser">
+      <div class="brand">
+        <span class="brand-mark">LF</span>
+        <div>
+          <h1>Love Fest Profiles</h1>
+          <p>Athlete history from competition data</p>
+        </div>
+      </div>
+
+      <label class="search-field">
+        <span>Search athletes</span>
+        <input id="searchInput" type="search" placeholder="Type a name, team, or division">
+      </label>
+
+      <div class="filter-row">
+        <select id="competitionFilter" aria-label="Filter by competition">
+          <option value="">All competitions</option>
+        </select>
+        <select id="divisionFilter" aria-label="Filter by division">
+          <option value="">All divisions</option>
+        </select>
+      </div>
+
+      <div class="list-meta">
+        <span id="athleteCount">Loading...</span>
+        <button id="clearFilters" type="button">Clear</button>
+      </div>
+
+      <div id="athleteList" class="athlete-list" aria-live="polite"></div>
+    </aside>
+
+    <section class="profile-panel" aria-live="polite">
+      <div id="emptyState" class="empty-state">
+        <h2>Select an athlete</h2>
+        <p>Search or choose a name to see their competition profile, teams, divisions, and workout-by-workout history.</p>
+      </div>
+
+      <div id="profileView" class="profile-view hidden">
+        <header class="profile-header">
+          <div>
+            <p id="profileEyebrow" class="eyebrow"></p>
+            <h2 id="athleteName"></h2>
+            <p id="profileSubtitle"></p>
+          </div>
+          <div id="riskBadge" class="risk-badge">No risk data</div>
+        </header>
+
+        <div class="stat-grid">
+          <div class="stat">
+            <span>Competitions</span>
+            <strong id="statCompetitions">0</strong>
+          </div>
+          <div class="stat">
+            <span>Teams</span>
+            <strong id="statTeams">0</strong>
+          </div>
+          <div class="stat">
+            <span>Best Overall</span>
+            <strong id="statBestOverall">-</strong>
+          </div>
+          <div class="stat">
+            <span>Best Workout</span>
+            <strong id="statBestWorkout">-</strong>
+          </div>
+        </div>
+
+        <section class="section-block">
+          <div class="section-heading">
+            <h3>Competition Summary</h3>
+            <select id="historyCompetitionFilter" aria-label="Filter history by competition">
+              <option value="">All history</option>
+            </select>
+          </div>
+          <div id="competitionCards" class="competition-grid"></div>
+        </section>
+
+        <section class="section-block">
+          <div class="section-heading">
+            <h3>Workout History</h3>
+            <span id="historyCount" class="muted"></span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Competition</th>
+                  <th>Division</th>
+                  <th>Team</th>
+                  <th>Workout</th>
+                  <th>Rank</th>
+                  <th>Score</th>
+                  <th>Points</th>
+                </tr>
+              </thead>
+              <tbody id="historyBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

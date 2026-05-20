@@ -1,0 +1,452 @@
+:root {
+  --ink: #22262b;
+  --muted: #69717d;
+  --line: #d9dee5;
+  --panel: #f6f7f9;
+  --paper: #ffffff;
+  --accent: #0f766e;
+  --accent-strong: #115e59;
+  --gold: #b7791f;
+  --red: #b42318;
+  --orange: #b45309;
+  --green: #16784f;
+  --shadow: 0 12px 34px rgba(25, 35, 45, 0.09);
+  color-scheme: light;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background: #eceff3;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 360px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 100vh;
+  padding: 22px;
+  background: var(--paper);
+  border-right: 1px solid var(--line);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 7px;
+  color: #fff;
+  background: var(--accent);
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.brand h1,
+.profile-header h2,
+.section-heading h3,
+.empty-state h2 {
+  margin: 0;
+  letter-spacing: 0;
+}
+
+.brand h1 {
+  font-size: 19px;
+  line-height: 1.15;
+}
+
+.brand p,
+#profileSubtitle,
+.empty-state p,
+.muted {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
+
+.search-field {
+  display: grid;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.search-field input,
+select {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fff;
+  color: var(--ink);
+  padding: 9px 10px;
+}
+
+.search-field input:focus,
+select:focus,
+button:focus {
+  outline: 3px solid rgba(15, 118, 110, 0.18);
+  border-color: var(--accent);
+}
+
+.filter-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.list-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+button {
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fff;
+  color: var(--ink);
+  padding: 7px 10px;
+  cursor: pointer;
+}
+
+button:hover {
+  border-color: var(--accent);
+  color: var(--accent-strong);
+}
+
+.athlete-list {
+  display: grid;
+  gap: 8px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.athlete-button {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  min-height: 68px;
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  background: #fff;
+}
+
+.athlete-button:hover,
+.athlete-button.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+}
+
+.athlete-button strong {
+  font-size: 14px;
+}
+
+.athlete-button span {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.profile-panel {
+  min-width: 0;
+  padding: 28px;
+}
+
+.profile-view {
+  display: grid;
+  gap: 22px;
+}
+
+.hidden {
+  display: none;
+}
+
+.empty-state {
+  max-width: 520px;
+  margin: 12vh auto;
+  padding: 32px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  box-shadow: var(--shadow);
+}
+
+.profile-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  box-shadow: var(--shadow);
+}
+
+.profile-header h2 {
+  font-size: clamp(28px, 4vw, 44px);
+  line-height: 1;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--accent-strong);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.risk-badge {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  padding: 8px 11px;
+  color: var(--muted);
+  background: #fff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.risk-badge.high {
+  color: var(--red);
+  background: #fff1f0;
+  border-color: #ffccc7;
+}
+
+.risk-badge.medium {
+  color: var(--orange);
+  background: #fff7ed;
+  border-color: #fed7aa;
+}
+
+.risk-badge.low {
+  color: var(--green);
+  background: #edfdf5;
+  border-color: #bbf7d0;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.stat,
+.section-block {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+}
+
+.stat {
+  display: grid;
+  gap: 8px;
+  min-height: 98px;
+  padding: 16px;
+}
+
+.stat span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.stat strong {
+  font-size: 26px;
+  line-height: 1.05;
+}
+
+.section-block {
+  min-width: 0;
+  padding: 18px;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.section-heading h3 {
+  font-size: 18px;
+}
+
+.section-heading select {
+  max-width: 230px;
+}
+
+.competition-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 12px;
+}
+
+.competition-card {
+  display: grid;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  background: var(--panel);
+}
+
+.competition-card h4 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.mini-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.mini-stats span {
+  display: grid;
+  gap: 2px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.mini-stats strong {
+  color: var(--ink);
+  font-size: 17px;
+}
+
+.rank-bars {
+  display: grid;
+  gap: 6px;
+}
+
+.rank-bar {
+  display: grid;
+  grid-template-columns: 90px 1fr 34px;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.bar-track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #dbe3ea;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+}
+
+.table-wrap {
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+table {
+  width: 100%;
+  min-width: 820px;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 11px 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+  font-size: 13px;
+}
+
+th {
+  position: sticky;
+  top: 0;
+  background: #f8fafc;
+  color: #4b5563;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+@media (max-width: 920px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    min-height: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .athlete-list {
+    max-height: 330px;
+  }
+
+  .profile-panel {
+    padding: 18px;
+  }
+
+  .profile-header,
+  .section-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .section-heading select {
+    max-width: none;
+  }
+
+  .stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .filter-row,
+  .stat-grid,
+  .mini-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar,
+  .profile-panel {
+    padding: 14px;
+  }
+}
