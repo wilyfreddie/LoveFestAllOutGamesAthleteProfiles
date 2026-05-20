@@ -1,4 +1,4 @@
-# Love Fest Athlete Profiles
+# LoveFest and AllOut Games Athlete Profiles
 
 A static athlete profile browser for `competition_data.csv`.
 

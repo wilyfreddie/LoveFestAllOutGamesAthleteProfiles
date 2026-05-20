@@ -53,16 +53,22 @@ select {
   gap: 12px;
 }
 
-.brand-mark {
-  display: grid;
-  place-items: center;
-  width: 42px;
-  height: 42px;
-  border-radius: 7px;
-  color: #fff;
-  background: var(--accent);
-  font-weight: 800;
-  letter-spacing: 0;
+.brand-logos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  width: 88px;
+  min-height: 48px;
+}
+
+.brand-logos img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  border-radius: 6px;
+  background: #fff;
 }
 
 .brand h1,
@@ -74,7 +80,7 @@ select {
 }
 
 .brand h1 {
-  font-size: 19px;
+  font-size: 18px;
   line-height: 1.15;
 }
 
