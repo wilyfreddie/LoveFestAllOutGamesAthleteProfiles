@@ -4,8 +4,16 @@ import time
 import re
 
 BASE = "https://competitioncorner.net/api2/v1/leaderboard"
-EVENT_ID = 20467
-LOVE_FEST_COMPETITION = "Love Fest 2026"
+LOVE_FEST_COMPETITIONS = [
+    {
+        "name": "Love Fest 2025",
+        "event_id": 15805,
+    },
+    {
+        "name": "Love Fest 2026",
+        "event_id": 20467,
+    },
+]
 STRONGEST_BASE = "https://compete-strongest-com.global.ssl.fastly.net/api/p"
 STRONGEST_COMPETITIONS = [
     {
@@ -106,8 +114,8 @@ def expand_athlete_rows(df):
 
 
 # 🔹 Get divisions
-def get_divisions():
-    url = f"{BASE}/{EVENT_ID}/"
+def get_divisions(event_id):
+    url = f"{BASE}/{event_id}/"
     r = requests.get(url, headers=HEADERS, timeout=30)
     r.raise_for_status()
     data = r.json()
@@ -125,8 +133,8 @@ def get_divisions():
 
 
 # 🔹 Get athletes per division
-def get_athletes(division_id):
-    url = f"{BASE}/{EVENT_ID}/tab/{division_id}?start=0&end=1000&athletesOnly=false"
+def get_athletes(event_id, division_id):
+    url = f"{BASE}/{event_id}/tab/{division_id}?start=0&end=1000&athletesOnly=false"
     r = requests.get(url, headers=HEADERS, timeout=30)
     r.raise_for_status()
     data = r.json()
@@ -151,7 +159,7 @@ def get_participant_data(division_id, roster_id):
 
 
 # 🔹 Extract everything safely
-def extract_data(division_id, division_name, division_raw_name, athletes, workouts):
+def extract_data(competition_name, division_id, division_name, division_raw_name, athletes, workouts):
     records = []
     participant_cache = {}
     workout_names = {
@@ -234,7 +242,7 @@ def extract_data(division_id, division_name, division_raw_name, athletes, workou
                 records.append({
                     "team": team,
                     "athletes": athlete_names,
-                    "competition": LOVE_FEST_COMPETITION,
+                    "competition": competition_name,
                     "source": "competition_corner",
                     "division": division_name,
                     "division_raw": division_raw_name,
@@ -258,7 +266,7 @@ def extract_data(division_id, division_name, division_raw_name, athletes, workou
                         records.append({
                             "team": team,
                             "athletes": athlete_names,
-                            "competition": LOVE_FEST_COMPETITION,
+                            "competition": competition_name,
                             "source": "competition_corner",
                             "division": division_name,
                             "division_raw": division_raw_name,
@@ -277,7 +285,7 @@ def extract_data(division_id, division_name, division_raw_name, athletes, workou
                 records.append({
                     "team": team,
                     "athletes": athlete_names,
-                    "competition": LOVE_FEST_COMPETITION,
+                    "competition": competition_name,
                     "source": "competition_corner",
                     "division": division_name,
                     "division_raw": division_raw_name,
@@ -406,17 +414,18 @@ def extract_strongest_data(competition_name, division, leaderboard):
     return records
 
 
-def collect_love_fest_data():
+def collect_love_fest_data(competition):
     all_data = []
 
-    divisions = get_divisions()
-    print(f"{LOVE_FEST_COMPETITION}: Found {len(divisions)} divisions")
+    divisions = get_divisions(competition["event_id"])
+    print(f"{competition['name']}: Found {len(divisions)} divisions")
 
     for d in divisions:
         print(f"\nProcessing division: {d['name']}")
 
-        athletes, workouts = get_athletes(d["id"])
+        athletes, workouts = get_athletes(competition["event_id"], d["id"])
         records = extract_data(
+            competition["name"],
             d["id"],
             d["name"],
             d["raw_name"],
@@ -452,7 +461,8 @@ def collect_strongest_data(competition):
 # 🔹 MAIN
 def main():
     all_data = []
-    all_data.extend(collect_love_fest_data())
+    for competition in LOVE_FEST_COMPETITIONS:
+        all_data.extend(collect_love_fest_data(competition))
 
     for competition in STRONGEST_COMPETITIONS:
         all_data.extend(collect_strongest_data(competition))

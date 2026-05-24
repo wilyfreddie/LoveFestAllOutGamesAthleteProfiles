@@ -117,6 +117,7 @@ def analyze_sandbagging(df: pd.DataFrame) -> pd.DataFrame:
         "avg_rank",
         "rank_std",
         "avg_percentile",
+        "best_overall_rank",
         "sandbagging_score",
         "risk_flag",
     ]
@@ -166,6 +167,7 @@ def create_athlete_lookup(analysis: pd.DataFrame) -> pd.DataFrame:
         "avg_rank": "mean",
         "rank_std": "mean",
         "avg_percentile": "mean",
+        "best_overall_rank": "min",
         "sandbagging_score": "max",
     }
     if "competition" in lookup.columns:
@@ -204,6 +206,7 @@ def create_athlete_lookup(analysis: pd.DataFrame) -> pd.DataFrame:
         "avg_rank",
         "rank_std",
         "avg_percentile",
+        "best_overall_rank",
         "sandbagging_score",
         "risk_flag",
     ]

@@ -16,12 +16,22 @@
         </div>
         <div>
           <h1>LoveFest and AllOut Games Profiles</h1>
-          <p>Athlete history across competitions</p>
+          <p>🏁 Athlete history across competitions</p>
         </div>
       </div>
 
+      <button id="themeToggle" class="theme-toggle" type="button" aria-label="Switch to dark mode">
+        <span id="themeIcon" aria-hidden="true">☾</span>
+        <span id="themeText">Dark mode</span>
+      </button>
+
+      <div class="view-tabs" aria-label="App views">
+        <button id="profilesTab" type="button" class="active">Profiles</button>
+        <button id="leaderboardsTab" type="button">Leaderboards</button>
+      </div>
+
       <label class="search-field">
-        <span>Search athletes</span>
+        <span>🔎 Search athletes</span>
         <input id="searchInput" type="search" placeholder="Type a name, team, or division">
       </label>
 
@@ -34,18 +44,72 @@
         </select>
       </div>
 
+      <select id="riskFilter" aria-label="Filter by sandbagger risk">
+        <option value="">All risk levels</option>
+        <option value="HIGH">High risk</option>
+        <option value="MEDIUM">Medium risk</option>
+        <option value="LOW">Low risk</option>
+        <option value="NONE">No risk data</option>
+      </select>
+
       <div class="list-meta">
         <span id="athleteCount">Loading...</span>
         <button id="clearFilters" type="button">Clear</button>
+      </div>
+
+      <section class="included-competitions" aria-label="Included competitions">
+        <h2>🏆 Included Competitions</h2>
+        <div id="includedCompetitions"></div>
+      </section>
+
+      <div class="tiny-lifts" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
       </div>
 
       <div id="athleteList" class="athlete-list" aria-live="polite"></div>
     </aside>
 
     <section class="profile-panel" aria-live="polite">
+      <section id="insightsView" class="insights-view hidden">
+        <div class="section-heading">
+          <h2>📊 Dataset Insights</h2>
+          <span id="datasetMeta" class="muted"></span>
+        </div>
+
+        <div id="coverageSummary" class="coverage-grid"></div>
+
+        <div class="insight-grid">
+          <section class="section-block compact-section">
+            <div class="section-heading">
+              <h3>🏋️ Box Leaderboard</h3>
+              <span id="boxLeaderboardMeta" class="muted"></span>
+            </div>
+            <div id="boxLeaderboard" class="insight-list"></div>
+          </section>
+
+          <section class="section-block compact-section">
+            <div class="section-heading">
+              <h3>🚩 Risk Leaderboard</h3>
+              <span id="riskLeaderboardMeta" class="muted"></span>
+            </div>
+            <div id="riskLeaderboard" class="insight-list"></div>
+          </section>
+
+          <section class="section-block compact-section">
+            <div class="section-heading">
+              <h3>🧭 Division Movement</h3>
+              <span id="movementMeta" class="muted"></span>
+            </div>
+            <div id="movementList" class="insight-list"></div>
+          </section>
+        </div>
+      </section>
+
       <div id="emptyState" class="empty-state">
         <h2>Select an athlete</h2>
-        <p>Search or choose a name to see their competition profile, teams, divisions, and workout-by-workout history.</p>
+        <p>Search or choose a name to see their competition profile, teams, divisions, and workout-by-workout history. ✨</p>
       </div>
 
       <div id="profileView" class="profile-view hidden">
@@ -60,26 +124,42 @@
 
         <div class="stat-grid">
           <div class="stat">
-            <span>Competitions</span>
+            <span>🏟️ Competitions</span>
             <strong id="statCompetitions">0</strong>
           </div>
           <div class="stat">
-            <span>Teams</span>
+            <span>🤝 Teams</span>
             <strong id="statTeams">0</strong>
           </div>
           <div class="stat">
-            <span>Best Overall</span>
+            <span>🥇 Best Overall</span>
             <strong id="statBestOverall">-</strong>
           </div>
           <div class="stat">
-            <span>Best Workout</span>
+            <span>⚡ Best Workout</span>
             <strong id="statBestWorkout">-</strong>
           </div>
         </div>
 
         <section class="section-block">
           <div class="section-heading">
-            <h3>Competition Summary</h3>
+            <h3>🧮 Sandbagger Risk Calculation</h3>
+            <span id="riskScoreMeta" class="muted"></span>
+          </div>
+          <div id="riskCalculation" class="risk-calculation"></div>
+        </section>
+
+        <section class="section-block">
+          <div class="section-heading">
+            <h3>🕹️ Division Timeline</h3>
+            <span id="divisionTimelineMeta" class="muted"></span>
+          </div>
+          <div id="divisionTimeline" class="division-timeline"></div>
+        </section>
+
+        <section class="section-block">
+          <div class="section-heading">
+            <h3>📌 Competition Summary</h3>
             <select id="historyCompetitionFilter" aria-label="Filter history by competition">
               <option value="">All history</option>
             </select>
@@ -89,7 +169,7 @@
 
         <section class="section-block">
           <div class="section-heading">
-            <h3>Workout History</h3>
+            <h3>🔥 Workout History</h3>
             <span id="historyCount" class="muted"></span>
           </div>
           <div class="table-wrap">
