@@ -9,7 +9,7 @@ const state = {
   movements: [],
   selectedAthlete: "",
   historyCompetition: "",
-  activeView: "profiles",
+  activeView: "leaderboards",
 };
 
 const elements = {
@@ -561,7 +561,7 @@ function athleteRows() {
 function renderProfile() {
   const rows = athleteRows();
   if (!rows.length) {
-    setActiveView("profiles");
+    setActiveView("leaderboards");
     return;
   }
 
