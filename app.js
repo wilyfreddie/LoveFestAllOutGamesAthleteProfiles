@@ -767,18 +767,33 @@ function renderRankBars(rows) {
 
   if (!ranked.length) return '<p class="muted">No workout ranks recorded.</p>';
 
-  const maxRank = Math.max(...ranked.map((row) => numberValue(row.workout_rank) ?? 1), 1);
   return ranked.map((row) => {
-    const rank = numberValue(row.workout_rank) ?? maxRank;
-    const width = Math.max(8, 100 - ((rank - 1) / maxRank) * 75);
+    const rank = numberValue(row.workout_rank);
+    const fieldSize = workoutFieldSize(row);
+    const marker = rank === null || fieldSize <= 1
+      ? 50
+      : Math.max(0, Math.min(100, ((rank - 1) / (fieldSize - 1)) * 100));
+    const fieldLabel = fieldSize ? `of ${fieldSize}` : "";
+
     return `
       <div class="rank-bar">
         <span>${escapeHtml(row.workout)}</span>
-        <span class="bar-track"><span class="bar-fill" style="width: ${width}%"></span></span>
-        <strong>${formatRank(row.workout_rank)}</strong>
+        <span class="placement-track" title="${escapeHtml(`Placed ${formatRank(row.workout_rank)} ${fieldLabel}`)}">
+          <span class="placement-marker" style="left: ${marker}%"></span>
+        </span>
+        <strong>${formatRank(row.workout_rank)} <small>${escapeHtml(fieldLabel)}</small></strong>
       </div>
     `;
   }).join("");
+}
+
+function workoutFieldSize(row) {
+  const matchingRows = state.rows.filter((candidate) => (
+    candidate.competition === row.competition
+    && candidate.division === row.division
+    && candidate.workout === row.workout
+  ));
+  return unique(matchingRows.map((candidate) => candidate.team)).length;
 }
 
 function renderHistory(rows) {
