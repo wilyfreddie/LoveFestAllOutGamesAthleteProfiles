@@ -109,6 +109,24 @@ function unique(values) {
   return [...new Set(values.map(normalize).filter(Boolean))];
 }
 
+function hasTeamMembers(row) {
+  const athlete = athleteKey(row.athlete);
+  const athletes = athleteKey(row.athletes);
+  return athletes && athletes !== athlete;
+}
+
+function isTeamOnlyRow(row) {
+  return row.athlete && row.team && row.athletes
+    && row.athlete === row.team
+    && row.team === row.athletes;
+}
+
+function athleteTeams(rows) {
+  return unique(rows
+    .filter((row) => hasTeamMembers(row))
+    .map((row) => row.team));
+}
+
 function formatRank(value) {
   const number = numberValue(value);
   return number === null ? "-" : `#${number}`;
@@ -216,7 +234,10 @@ function renderIncludedCompetitions() {
     const pill = document.createElement("button");
     pill.type = "button";
     pill.className = "competition-pill";
-    pill.textContent = `🏆 ${competition}`;
+    pill.textContent = competition
+      .replace("Love Fest ", "LF ")
+      .replace("All Out Games ", "AO ");
+    pill.title = competition;
     pill.addEventListener("click", () => {
       elements.competitionFilter.value = competition;
       renderAthleteList();
@@ -247,11 +268,11 @@ function buildAthletes() {
       rows,
       competitions: unique(rows.map((row) => row.competition)),
       divisions: unique(rows.map((row) => row.division)),
-      teams: unique(rows.map((row) => row.team)),
+      teams: athleteTeams(rows),
       affiliates: unique(rows.map((row) => row.affiliate)),
       risk: getBestRiskForKey(key),
     }))
-    .filter((athlete) => athlete.name)
+    .filter((athlete) => athlete.name && !athlete.rows.every(isTeamOnlyRow))
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 
@@ -494,6 +515,17 @@ function matchesRiskFilter(risk, filter) {
 function renderAthleteList() {
   const athletes = getFilteredAthletes();
   elements.athleteCount.textContent = plural(athletes.length, "athlete");
+
+  const hasFilters = elements.searchInput.value
+    || elements.competitionFilter.value
+    || elements.divisionFilter.value
+    || elements.riskFilter.value;
+  elements.athleteCount.classList.toggle("filtered", hasFilters);
+
+  document.querySelectorAll(".competition-pill").forEach((pill) => {
+    pill.classList.toggle("active", pill.textContent === elements.competitionFilter.value.replace("Love Fest ", "LF ").replace("All Out Games ", "AO "));
+  });
+
   elements.athleteList.replaceChildren();
 
   if (!athletes.length) {
@@ -555,7 +587,7 @@ function selectAthlete(name, shouldScroll = true) {
 }
 
 function athleteRows() {
-  return state.rows.filter((row) => normalize(row.athlete) === state.selectedAthlete);
+  return state.rows.filter((row) => athleteKey(row.athlete) === athleteKey(state.selectedAthlete));
 }
 
 function renderProfile() {
@@ -568,7 +600,7 @@ function renderProfile() {
   setActiveView("profiles");
 
   const competitions = unique(rows.map((row) => row.competition));
-  const teams = unique(rows.map((row) => row.team));
+  const teams = athleteTeams(rows);
   const divisions = unique(rows.map((row) => row.division));
   const affiliates = unique(rows.map((row) => row.affiliate));
   const overallRanks = rows.map((row) => numberValue(row.overall_rank)).filter((value) => value !== null);
@@ -787,6 +819,11 @@ function renderRankBars(rows) {
   }).join("");
 }
 
+function workoutSortIndex(workout) {
+  const match = normalize(workout).match(/(\d+)/);
+  return match ? Number(match[1]) : Number.MAX_SAFE_INTEGER;
+}
+
 function workoutFieldSize(row) {
   const matchingRows = state.rows.filter((candidate) => (
     candidate.competition === row.competition
@@ -802,10 +839,11 @@ function renderHistory(rows) {
     .filter((row) => !competition || row.competition === competition)
     .slice()
     .sort((a, b) => (
-      a.competition.localeCompare(b.competition)
+      compareCompetitions(a.competition, b.competition)
       || a.division.localeCompare(b.division)
-      || (numberValue(a.workout_rank) ?? 9999) - (numberValue(b.workout_rank) ?? 9999)
+      || workoutSortIndex(a.workout) - workoutSortIndex(b.workout)
       || a.workout.localeCompare(b.workout)
+      || (numberValue(a.workout_rank) ?? 9999) - (numberValue(b.workout_rank) ?? 9999)
     ));
 
   elements.historyCount.textContent = plural(history.length, "row");

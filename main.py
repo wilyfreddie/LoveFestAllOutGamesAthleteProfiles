@@ -1,3 +1,4 @@
+import json
 import requests
 import pandas as pd
 import time
@@ -23,6 +24,13 @@ STRONGEST_COMPETITIONS = [
     {
         "name": "All Out Games 2025",
         "code": "all-out-games-2025",
+    },
+]
+CIRCLE21_BASE = "https://api.circle21.events/api"
+CIRCLE21_COMPETITIONS = [
+    {
+        "name": "Love Fest 2024",
+        "competition_id": "774f4a3f-6b96-4d0c-aec0-40ed9a71aad0",
     },
 ]
 OUTPUT_CSV = "competition_data.csv"
@@ -458,6 +466,166 @@ def collect_strongest_data(competition):
     return all_data
 
 
+def _circle21_dict_keep_last(pairs):
+    result = {}
+    for key, value in pairs:
+        result[key] = value
+    return result
+
+
+def parse_circle21_json(text):
+    return json.loads(text, object_pairs_hook=_circle21_dict_keep_last)
+
+
+def get_circle21_divisions(competition_id):
+    url = f"{CIRCLE21_BASE}/competitions/{competition_id}"
+    r = requests.get(url, headers=HEADERS, timeout=30)
+    r.raise_for_status()
+    data = r.json()
+
+    divisions = []
+    for d in data.get("competition_division", []):
+        name = d.get("name", "")
+        divisions.append({
+            "id": d.get("id"),
+            "name": normalize_division_name(name),
+            "raw_name": name,
+        })
+
+    return [div for div in divisions if div["id"]]
+
+
+def get_circle21_leaderboard(competition_id, division_id):
+    url = f"{CIRCLE21_BASE}/leaderboard/team?competition_id={competition_id}&division_id={division_id}"
+    r = requests.get(url, headers=HEADERS, timeout=30)
+    r.raise_for_status()
+    return parse_circle21_json(r.text)
+
+
+def get_circle21_team_members(team_id):
+    url = f"{CIRCLE21_BASE}/teams/{team_id}/member"
+    r = requests.get(url, headers=HEADERS, timeout=30)
+    if r.status_code != 200:
+        return []
+    return r.json()
+
+
+def _format_circle21_score(workout, result):
+    first_field = workout.get("first_field", "")
+
+    if first_field == "time":
+        time_ms = result.get("time")
+        if time_ms is not None:
+            total_seconds = int(time_ms) // 1000
+            minutes = total_seconds // 60
+            seconds = total_seconds % 60
+            return f"{minutes}:{seconds:02d}"
+
+    if first_field == "how_many":
+        how_many = result.get("how_many")
+        if how_many is not None:
+            return f"{how_many} reps"
+
+    return None
+
+
+def collect_circle21_data(competition):
+    all_data = []
+
+    divisions = get_circle21_divisions(competition["competition_id"])
+    print(f"{competition['name']}: Found {len(divisions)} divisions")
+
+    for d in divisions:
+        print(f"\nProcessing division: {d['name']}")
+
+        leaderboard = get_circle21_leaderboard(
+            competition["competition_id"], d["id"]
+        )
+
+        # Top-level teams array sorted by cumulative points (ascending = best)
+        overall_teams = leaderboard.get("teams", [])
+
+        # Wods array: each wod has nested workouts with per-event scores/ranks
+        wods = leaderboard.get("wods", [])
+
+        # Fetch team members
+        member_cache = {}
+        team_ids = {
+            team["id"] for team in overall_teams if team.get("id")
+        }
+
+        for team_id in team_ids:
+            members = get_circle21_team_members(team_id)
+            if members:
+                names = [
+                    m.get("athlete", {}).get("user", {}).get("name")
+                    for m in members
+                    if m.get("athlete", {}).get("user", {}).get("name")
+                ]
+                member_cache[team_id] = unique_join(names)
+            else:
+                member_cache[team_id] = None
+            time.sleep(0.1)
+
+        # Build overall rank lookup (derived from sorted array position)
+        overall_rank_lookup = {}
+        for rank, team in enumerate(overall_teams, start=1):
+            overall_rank_lookup[team["id"]] = rank
+
+        for wod_entry in wods:
+            wod_workouts = wod_entry.get("workouts", [])
+
+            for workout_entry in wod_workouts:
+                workout = workout_entry.get("workout", {})
+                workout_name = workout.get("name", "")
+
+                per_workout_teams = workout_entry.get("teams", [])
+                workout_scores = workout_entry.get("results", [])
+
+                # Map team_id to workout result (for score display)
+                result_by_team = {}
+                for wr in workout_scores:
+                    team_id = wr.get("team_id")
+                    if team_id:
+                        result_by_team[team_id] = wr
+
+                for wt in per_workout_teams:
+                    team_id = wt.get("id")
+                    wr = result_by_team.get(team_id)
+
+                    # Look up team info from overall standings
+                    team_info = None
+                    for ot in overall_teams:
+                        if ot["id"] == team_id:
+                            team_info = ot
+                            break
+
+                    athletes = member_cache.get(team_id)
+                    if not athletes:
+                        continue
+
+                    all_data.append({
+                        "team": wt.get("name"),
+                        "athletes": athletes,
+                        "competition": competition["name"],
+                        "source": "circle21",
+                        "division": d["name"],
+                        "division_raw": d["raw_name"],
+                        "division_id": d["id"],
+                        "affiliate": (team_info or wt).get("box_name") or None,
+                        "overall_rank": overall_rank_lookup.get(team_id),
+                        "points": (team_info or {}).get("points"),
+                        "workout": workout_name,
+                        "workout_rank": wt.get("position"),
+                        "workout_score": _format_circle21_score(workout, wr) if wr else None,
+                        "workout_points": wt.get("points"),
+                    })
+
+        print(f"{d['id']}: Processed {len(overall_teams)} teams, {len(all_data)} rows so far")
+
+    return all_data
+
+
 # 🔹 MAIN
 def main():
     all_data = []
@@ -466,6 +634,9 @@ def main():
 
     for competition in STRONGEST_COMPETITIONS:
         all_data.extend(collect_strongest_data(competition))
+
+    for competition in CIRCLE21_COMPETITIONS:
+        all_data.extend(collect_circle21_data(competition))
 
     df = expand_athlete_rows(pd.DataFrame(all_data))
 

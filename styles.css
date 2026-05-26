@@ -183,34 +183,6 @@ select {
   box-shadow: 0 6px 16px rgba(25, 35, 45, 0.08);
 }
 
-.tiny-lifts {
-  display: flex;
-  justify-content: center;
-  gap: 7px;
-  min-height: 8px;
-}
-
-.tiny-lifts span {
-  width: 18px;
-  height: 3px;
-  border-radius: 999px;
-  background: var(--line);
-  opacity: 0.8;
-  transform-origin: center;
-}
-
-.tiny-lifts span:nth-child(1) {
-  animation: tiny-lift 2.8s ease-in-out infinite;
-}
-
-.tiny-lifts span:nth-child(2) {
-  animation: tiny-lift 2.8s ease-in-out 0.2s infinite;
-}
-
-.tiny-lifts span:nth-child(3) {
-  animation: tiny-lift 2.8s ease-in-out 0.4s infinite;
-}
-
 .brand h1,
 .profile-header h2,
 .section-heading h2,
@@ -272,41 +244,50 @@ button:focus {
   font-size: 13px;
 }
 
+#athleteCount.filtered {
+  color: var(--accent-strong);
+  font-weight: 700;
+}
+
 .included-competitions {
-  display: grid;
-  gap: 8px;
-  padding: 12px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--panel);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 6px 0 0;
 }
 
 .included-competitions h2 {
   margin: 0;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .included-competitions div {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  display: contents;
 }
 
 .competition-pill {
-  min-height: 28px;
+  min-height: 24px;
   border-radius: 999px;
-  padding: 5px 9px;
+  padding: 3px 7px;
   color: var(--accent-strong);
   background:
     linear-gradient(135deg, rgba(45, 212, 191, 0.12), rgba(246, 196, 83, 0.12)),
     var(--chip-bg);
   border-color: var(--chip-line);
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 700;
+}
+
+.competition-pill.active {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--paper);
 }
 
 button {
@@ -925,22 +906,6 @@ th {
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-}
-
-@keyframes tiny-lift {
-  0%,
-  100% {
-    transform: translateY(0) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-3px) rotate(-8deg);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .tiny-lifts span {
-    animation: none;
-  }
 }
 
 tbody tr:last-child td {
